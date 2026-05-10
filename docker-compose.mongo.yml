@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  mongodb-wbi:
+    image: mongo:6
+    container_name: wabetainfo-mongo
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: wabetainfo
+    volumes:
+      - wbi_mongo_data:/data/db
+
+  mongo-express-wbi:
+    image: mongo-express:1
+    container_name: wabetainfo-mongo-express
+    restart: unless-stopped
+    ports:
+      - "27019:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb-wbi
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: "admin"
+      ME_CONFIG_BASICAUTH_PASSWORD: "wabetainfo"
+    depends_on:
+      - mongodb-wbi
+
+volumes:
+  wbi_mongo_data:
