@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 
 # Interval scrape dalam detik (1 jam = 3600 detik)
-SCRAPE_INTERVAL = 10
+SCRAPE_INTERVAL = 3600
 
 def run_scraper():
     logging.info("Memulai proses pengecekan artikel terbaru di halaman 1...")
