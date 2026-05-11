@@ -8,6 +8,8 @@ services:
     ports:
       - "27018:27017"
     environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: wabetainfo
       MONGO_INITDB_DATABASE: wabetainfo
     volumes:
       - wbi_mongo_data:/data/db
@@ -21,6 +23,8 @@ services:
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb-wbi
       ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: wabetainfo
       ME_CONFIG_BASICAUTH_USERNAME: "admin"
       ME_CONFIG_BASICAUTH_PASSWORD: "wabetainfo"
     depends_on:

@@ -826,12 +826,17 @@ def run_demo(output_file):
 #  MONGODB HELPER
 # ─────────────────────────────────────────
 
-def mongo_connect(host, port, db_name, col_name):
+def mongo_connect(host, port, db_name, col_name, username=None, password=None):
     if not HAS_MONGO:
         print("[!] pymongo not installed — run: pip install pymongo")
         return None, None
     try:
-        client = MongoClient(host=host, port=port, serverSelectionTimeoutMS=5000)
+        kwargs = dict(host=host, port=port, serverSelectionTimeoutMS=5000)
+        if username and password:
+            kwargs["username"] = username
+            kwargs["password"] = password
+            kwargs["authSource"] = "admin"
+        client = MongoClient(**kwargs)
         client.admin.command("ping")
         col = client[db_name][col_name]
         # Indexes
@@ -877,6 +882,8 @@ def main():
     parser.add_argument("--mongo-port",   type=int, default=27018,  help="MongoDB port (default: 27018)")
     parser.add_argument("--mongo-db",     default="wabetainfo",     help="MongoDB database name")
     parser.add_argument("--mongo-col",    default="articles",       help="MongoDB collection name")
+    parser.add_argument("--mongo-user",   default="admin",          help="MongoDB username (default: admin)")
+    parser.add_argument("--mongo-pass",   default="wabetainfo",     help="MongoDB password (default: wabetainfo)")
     args = parser.parse_args()
 
     if args.demo:
@@ -887,7 +894,8 @@ def main():
     mongo_client, mongo_col = None, None
     if args.mongo:
         mongo_client, mongo_col = mongo_connect(
-            args.mongo_host, args.mongo_port, args.mongo_db, args.mongo_col
+            args.mongo_host, args.mongo_port, args.mongo_db, args.mongo_col,
+            username=args.mongo_user, password=args.mongo_pass
         )
 
     print("=" * 72)

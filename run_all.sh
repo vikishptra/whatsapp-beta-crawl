@@ -16,6 +16,8 @@ MONGO_HOST="localhost"
 MONGO_PORT=27018
 MONGO_DB="wabetainfo"
 MONGO_COL="articles"
+MONGO_USER="admin"
+MONGO_PASS="wabetainfo"
 OUTPUT="wabetainfo_data.json"
 VENV="./venv"
 # ──────────────────────────────────────────────────────────────
@@ -68,7 +70,9 @@ if [ "$MONGO_HOST" = "localhost" ] || [ "$MONGO_HOST" = "127.0.0.1" ]; then
   # Verify MongoDB is up
   MAX_TRIES=10
   COUNT=0
-  until docker exec wabetainfo-mongo mongosh --eval "db.adminCommand('ping')" --quiet &>/dev/null; do
+  until docker exec wabetainfo-mongo mongosh \
+      --username "$MONGO_USER" --password "$MONGO_PASS" --authenticationDatabase admin \
+      --eval "db.adminCommand('ping')" --quiet &>/dev/null; do
     COUNT=$((COUNT+1))
     if [ $COUNT -ge $MAX_TRIES ]; then
       echo "      ✗ MongoDB didn't start in time. Aborting."
@@ -119,7 +123,9 @@ python scrape-wabeta.py \
   --mongo-host "$MONGO_HOST" \
   --mongo-port "$MONGO_PORT" \
   --mongo-db "$MONGO_DB" \
-  --mongo-col "$MONGO_COL"
+  --mongo-col "$MONGO_COL" \
+  --mongo-user "$MONGO_USER" \
+  --mongo-pass "$MONGO_PASS"
 
 # ─── DONE ──────────────────────────────────────────────────────
 echo ""

@@ -37,8 +37,13 @@ DEFAULT_COL  = "articles"
 #  HELPERS
 # ─────────────────────────────────────────
 
-def connect(host, port, db_name, col_name):
-    client = MongoClient(host=host, port=port, serverSelectionTimeoutMS=5000)
+def connect(host, port, db_name, col_name, username=None, password=None):
+    kwargs = dict(host=host, port=port, serverSelectionTimeoutMS=5000)
+    if username and password:
+        kwargs["username"] = username
+        kwargs["password"] = password
+        kwargs["authSource"] = "admin"
+    client = MongoClient(**kwargs)
     # Test connection
     client.admin.command("ping")
     db  = client[db_name]
@@ -76,6 +81,8 @@ def main():
     parser.add_argument("--port",   type=int, default=DEFAULT_PORT)
     parser.add_argument("--db",     default=DEFAULT_DB,  help="Database name")
     parser.add_argument("--col",    default=DEFAULT_COL, help="Collection name")
+    parser.add_argument("--user",   default="admin",     help="MongoDB username (default: admin)")
+    parser.add_argument("--pass",   dest="password", default="wabetainfo", help="MongoDB password (default: wabetainfo)")
     parser.add_argument("--upsert", action="store_true", help="Upsert (update) existing docs")
     args = parser.parse_args()
 
@@ -95,7 +102,8 @@ def main():
     # ── Connect ──
     print(f"\n[*] Connecting to MongoDB {args.host}:{args.port}...")
     try:
-        client, col = connect(args.host, args.port, args.db, args.col)
+        client, col = connect(args.host, args.port, args.db, args.col,
+                              username=args.user, password=args.password)
         print(f"[✓] Connected → db={args.db}  collection={args.col}")
     except Exception as e:
         print(f"[!] Connection failed: {e}")
