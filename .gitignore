@@ -16,3 +16,4 @@ __pycache__/
 # Optional: IDE settings
 .vscode/
 .idea/
+wabetainfo_data.json
